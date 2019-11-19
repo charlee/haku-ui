@@ -49,18 +49,15 @@ const PreviewLayer: React.FC<Props> = props => {
     onLineCreated(line);
   };
 
-  const initPreview = (stage: Konva.Stage, layer: Konva.Layer) => {
-    stage.on('mousedown touchstart', () => handleDrawLineStart(layer));
-    stage.on('mouseup touchend', () => handleDrawLineEnd(layer));
-    stage.on('mousemove touchmove', () => handleDrawLineMove(layer));
-  };
-
   React.useEffect(() => {
     if (previewEl.current) {
-      const stage = previewEl.current.getStage();
-      initPreview(stage, previewEl.current);
+      const layer = previewEl.current;
+      const stage = layer.getStage();
+      stage.on('mousedown touchstart', () => handleDrawLineStart(layer));
+      stage.on('mouseup touchend', () => handleDrawLineEnd(layer));
+      stage.on('mousemove touchmove', () => handleDrawLineMove(layer));
     }
-  }, [color]);
+  }, [color, previewEl]);
 
   return <Layer ref={previewEl}></Layer>;
 };

@@ -36,7 +36,6 @@ const useStyles = makeStyles((theme: Theme) =>
       position: 'fixed',
       right: 20,
       top: 20,
-      width: 208,
     },
   }),
 );

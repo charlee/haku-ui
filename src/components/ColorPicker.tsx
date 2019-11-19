@@ -1,13 +1,15 @@
 import React from 'react';
 import classNames from 'classnames';
 import { makeStyles } from '@material-ui/styles';
-import { Theme, createStyles } from '@material-ui/core';
+import { Theme, createStyles, Paper } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       display: 'flex',
       flexFlow: 'row wrap',
+      width: 212,
+      padding: 8,
     },
 
     colorBlock: {
@@ -37,7 +39,7 @@ const ColorPicker: React.FC<Props> = props => {
   const handleColorClick = (color: string) => () => onColorChange(color);
 
   return (
-    <div className={classNames(classes.root, className)}>
+    <Paper className={classNames(classes.root, className)}>
       {colors.map(color => (
         <div
           key={color}
@@ -46,7 +48,7 @@ const ColorPicker: React.FC<Props> = props => {
           onClick={handleColorClick(color)}
         />
       ))}
-    </div>
+    </Paper>
   );
 };
 
