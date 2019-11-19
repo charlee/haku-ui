@@ -1,23 +1,35 @@
 import React from 'react';
-import { Router, Route, Link } from 'react-router-dom';
-import { createBrowserHistory } from 'history';
-import logo from './logo.svg';
 import './App.css';
 
-import HomePage from './HomePage';
-import TopBar from './TopBar';
+import { useRoutes } from 'hookrouter';
+import routes from '../routes';
 
-const history = createBrowserHistory();
+import TopBar from './TopBar';
+import { makeStyles, createStyles } from '@material-ui/styles';
+import { Theme } from '@material-ui/core';
+
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      backgroundColor: theme.palette.background.default,
+      width: '100%',
+      height: '100vh',
+    },
+  }),
+);
 
 const App: React.FC = () => {
+  const classes = useStyles();
+
+  const routeResult = useRoutes(routes);
+
   return (
-    <div className="App">
-      <Router history={history}>
-        <TopBar></TopBar>
-        <Route path="/" exact component={HomePage}/>
-      </Router>
+    <div className={classes.root}>
+      <TopBar></TopBar>
+      {routeResult}
     </div>
   );
-}
+};
 
 export default App;
