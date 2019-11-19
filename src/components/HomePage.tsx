@@ -1,15 +1,20 @@
-import React, { ReactEventHandler } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/styles';
-import { Theme, createStyles, Paper, Typography, Button, TextField } from '@material-ui/core';
+import { Theme, createStyles, Paper, Typography, Button, TextField, Grid, Box } from '@material-ui/core';
 import { navigate } from 'hookrouter';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {},
+    root: {
+      backgroundColor: theme.palette.background.default,
+      height: '100vh',
+      paddingTop: 180,
+    },
+
     form: {
       width: 600,
-      margin: '160px auto 0',
-      padding: theme.spacing(2),
+      margin: '0 auto',
+      padding: theme.spacing(4),
     },
   }),
 );
@@ -19,7 +24,10 @@ const HomePage: React.FC = () => {
 
   const [whiteboardId, setWhiteboardId] = React.useState('');
 
-  const handleCreateNew = () => {};
+  const handleCreateNew = () => {
+    const id = Math.floor(Math.random() * 1000000000);
+    navigate(`/b/${id}`);
+  };
 
   const handleJoin = () => {
     navigate(`/b/${whiteboardId}`);
@@ -31,18 +39,39 @@ const HomePage: React.FC = () => {
         <Typography variant="h4" align="center">
           Start your whiteboard
         </Typography>
-        <Button variant="contained" color="primary" onClick={handleCreateNew}>
-          Create a new whiteboard
-        </Button>
-        <div>or join an existing whiteboard</div>
-        <TextField
-          value={whiteboardId}
-          placeholder="e.g. 144-425-661"
-          onChange={e => setWhiteboardId(e.target.value)}
-        />
-        <Button variant="contained" color="primary" onClick={handleJoin}>
-          Join
-        </Button>
+
+        <Box mt={5}>
+          <Grid container spacing={3}>
+            <Grid item xs={6}>
+              <Typography variant="body1">Create a new whiteboard and share with your collaborators.</Typography>
+              <Box minHeight={160} display="flex" alignItems="center" justifyContent="center">
+                <Button variant="contained" color="primary" onClick={handleCreateNew}>
+                  Create whiteboard
+                </Button>
+              </Box>
+            </Grid>
+
+            <Grid item xs={6}>
+              <Typography variant="body1">Join an existing whiteboard if you know the id.</Typography>
+              <Box minHeight={160} display="flex" alignItems="center" justifyContent="center">
+                <Grid container spacing={1}>
+                  <Grid item xs={8}>
+                    <TextField
+                      value={whiteboardId}
+                      placeholder="e.g. 144-425-661"
+                      onChange={e => setWhiteboardId(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Button variant="contained" color="primary" onClick={handleJoin}>
+                      Join
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
       </Paper>
     </div>
   );
