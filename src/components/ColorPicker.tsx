@@ -11,13 +11,15 @@ const useStyles = makeStyles((theme: Theme) =>
     },
 
     colorBlock: {
-      width: 80,
-      height: 40,
-      border: '1px #000',
+      width: 48,
+      height: 32,
+      border: '2px #fff solid',
       cursor: 'pointer',
     },
 
-    active: {},
+    active: {
+      border: '2px #000 solid',
+    },
   }),
 );
 
@@ -32,10 +34,7 @@ const ColorPicker: React.FC<Props> = props => {
   const { selectedColor, colors, onColorChange, className } = props;
   const classes = useStyles();
 
-  const handleColorClick = (color: string) => () => {
-    console.log(color);
-    onColorChange(color);
-  };
+  const handleColorClick = (color: string) => () => onColorChange(color);
 
   return (
     <div className={classNames(classes.root, className)}>

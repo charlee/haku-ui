@@ -6,6 +6,23 @@ import { Stage, Layer } from 'react-konva';
 import PreviewLayer from './PreviewLayer';
 import simplifyLine from '../utils/simplifyLine';
 import ColorPicker from './ColorPicker';
+import {
+  red,
+  pink,
+  purple,
+  deepPurple,
+  indigo,
+  blue,
+  lightBlue,
+  cyan,
+  green,
+  lime,
+  yellow,
+  orange,
+  brown,
+  grey,
+  lightGreen,
+} from '@material-ui/core/colors';
 
 const uuidv1 = require('uuid/v1');
 
@@ -19,11 +36,29 @@ const useStyles = makeStyles((theme: Theme) =>
       position: 'fixed',
       right: 20,
       top: 20,
+      width: 208,
     },
   }),
 );
 
-const colors = ['#000000', '#FE3512', '#FA9600', '#5663FF', '#00F200', '#FE2C67'];
+const colors = [
+  red[500],
+  pink[300],
+  purple[400],
+  deepPurple[400],
+  indigo[400],
+  blue[500],
+  lightBlue[300],
+  cyan[400],
+  green[700],
+  lightGreen[400],
+  lime[500],
+  yellow[600],
+  orange[700],
+  brown[600],
+  grey[900],
+  grey[500],
+];
 
 const WhiteboardPage: React.FC<Props> = props => {
   const layerEl = React.useRef<Konva.Layer>(null);
