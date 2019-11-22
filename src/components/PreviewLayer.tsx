@@ -4,6 +4,7 @@ import { Stage, Layer } from 'react-konva';
 
 type Props = {
   onLineCreated: (line: Konva.Line) => void;
+  tool: string;
   color: string;
 };
 
@@ -17,15 +18,15 @@ class PreviewLayer extends React.Component<Props, State> {
   private previewEl = React.createRef<Konva.Layer>();
 
   handleDrawLineStart = (layer: Konva.Layer) => {
-    const { color } = this.props;
+    const { color, tool } = this.props;
 
     this.isPaint = true;
     let pos = layer.getStage().getPointerPosition();
 
     if (pos) {
       this.line = new Konva.Line({
-        stroke: color,
-        strokeWidth: 3,
+        stroke: tool === 'pen' ? color : '#ffffff',
+        strokeWidth: tool === 'pen' ? 3 : 24,
         globalCompositeOperation: 'source-over',
         points: [pos.x, pos.y],
         draggable: false,

@@ -1,20 +1,12 @@
 import React from 'react';
 import Konva from 'konva';
 import { makeStyles } from '@material-ui/styles';
-import {
-  Theme,
-  createStyles,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  CircularProgress,
-  Box,
-  Typography,
-} from '@material-ui/core';
+import { Theme, createStyles, Dialog, DialogContent, CircularProgress, Box, Typography } from '@material-ui/core';
 import { Stage, Layer } from 'react-konva';
 import PreviewLayer from './PreviewLayer';
 import simplifyLine from '../utils/simplifyLine';
 import ColorPicker from './ColorPicker';
+import ToolPicker from './ToolPicker';
 import {
   red,
   pink,
@@ -40,7 +32,7 @@ type Props = {
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    colorPicker: {
+    overlay: {
       position: 'fixed',
       right: 20,
       top: 20,
@@ -73,6 +65,7 @@ const WhiteboardPage: React.FC<Props> = props => {
   const classes = useStyles();
 
   const [selectedColor, setSelectedColor] = React.useState(colors[0]);
+  const [selectedTool, setSelectedTool] = React.useState('pen');
 
   const [connecting, setConnecting] = React.useState(false);
   const [error, setError] = React.useState(false);
@@ -118,14 +111,17 @@ const WhiteboardPage: React.FC<Props> = props => {
     <div className="WhiteboardPage">
       <Stage width={window.innerWidth} height={window.innerHeight - 150}>
         <Layer ref={layerEl}></Layer>
-        <PreviewLayer color={selectedColor} onLineCreated={handleLineCreated}></PreviewLayer>
+        <PreviewLayer color={selectedColor} tool={selectedTool} onLineCreated={handleLineCreated} />
       </Stage>
-      <ColorPicker
-        className={classes.colorPicker}
-        colors={colors}
-        selectedColor={selectedColor}
-        onColorChange={setSelectedColor}
-      />
+
+      <Box className={classes.overlay}>
+        <Box marginBottom={1}>
+          <ColorPicker colors={colors} selectedColor={selectedColor} onColorChange={setSelectedColor} />
+        </Box>
+        <Box marginBottom={1}>
+          <ToolPicker selectedTool={selectedTool} onToolChange={setSelectedTool} />
+        </Box>
+      </Box>
       <Dialog open={connecting}>
         <DialogContent>
           <Box alignItems="center" display="flex" padding={2}>
