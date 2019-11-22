@@ -71,18 +71,19 @@ const WhiteboardPage: React.FC<Props> = props => {
     console.log('handleLineCreated');
     if (layerEl.current) {
       const layer = layerEl.current;
-      console.log(line);
-      layer.add(simplifyLine(line, 1));
+      const simplifiedLine = simplifyLine(line, 1);
+      layer.add(simplifiedLine);
+      console.log(simplifiedLine.points().length);
       layer.batchDraw();
 
       // send to server
-      api.addLine({
-        type: 'line',
-        data: {
-          color: line.stroke(),
-          points: line.points(),
-        },
-      });
+      // api.addLine({
+      //   type: 'line',
+      //   data: {
+      //     color: line.stroke(),
+      //     points: line.points(),
+      //   },
+      // });
     }
   };
 

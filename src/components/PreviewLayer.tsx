@@ -7,59 +7,72 @@ type Props = {
   color: string;
 };
 
-const PreviewLayer: React.FC<Props> = props => {
-  const { onLineCreated, color } = props;
-  const previewEl = React.createRef<Konva.Layer>();
-  let isPaint = false;
-  let line: Konva.Line;
+type State = {
+  isPaint: boolean;
+};
 
-  const handleDrawLineStart = (layer: Konva.Layer) => {
-    isPaint = true;
+class PreviewLayer extends React.Component<Props, State> {
+  private isPaint: boolean = false;
+  private line?: Konva.Line = undefined;
+  private previewEl = React.createRef<Konva.Layer>();
+
+  handleDrawLineStart = (layer: Konva.Layer) => {
+    const { color } = this.props;
+
+    this.isPaint = true;
     let pos = layer.getStage().getPointerPosition();
 
     if (pos) {
-      line = new Konva.Line({
+      this.line = new Konva.Line({
         stroke: color,
         strokeWidth: 3,
         globalCompositeOperation: 'source-over',
         points: [pos.x, pos.y],
-        draggable: true,
+        draggable: false,
       });
 
-      layer.add(line);
+      layer.add(this.line);
     }
   };
 
-  const handleDrawLineMove = (layer: Konva.Layer) => {
-    if (!isPaint) {
+  handleDrawLineMove = (layer: Konva.Layer) => {
+    if (!this.isPaint || !this.line) {
       return;
     }
 
     const pos = layer.getStage().getPointerPosition();
     if (pos) {
-      line.points([...line.points(), pos.x, pos.y]);
+      this.line.points([...this.line.points(), pos.x, pos.y]);
       layer.batchDraw();
     }
   };
 
-  const handleDrawLineEnd = (layer: Konva.Layer) => {
-    isPaint = false;
+  handleDrawLineEnd = (layer: Konva.Layer) => {
+    const { onLineCreated } = this.props;
+
+    if (!this.isPaint || !this.line) {
+      return;
+    }
+
+    this.isPaint = false;
     layer.removeChildren();
     layer.draw();
-    onLineCreated(line);
+    onLineCreated(this.line);
   };
 
-  React.useEffect(() => {
-    if (previewEl.current) {
-      const layer = previewEl.current;
+  componentDidMount() {
+    if (this.previewEl.current) {
+      const layer = this.previewEl.current;
       const stage = layer.getStage();
-      stage.on('mousedown touchstart', () => handleDrawLineStart(layer));
-      stage.on('mouseup touchend', () => handleDrawLineEnd(layer));
-      stage.on('mousemove touchmove', () => handleDrawLineMove(layer));
+      stage.on('mousedown touchstart', () => this.handleDrawLineStart(layer));
+      stage.on('mouseup touchend', () => this.handleDrawLineEnd(layer));
+      stage.on('mousemove touchmove', () => this.handleDrawLineMove(layer));
     }
-  }, [color, previewEl]);
+  }
 
-  return <Layer ref={previewEl}></Layer>;
-};
+  render() {
+    return <Layer ref={this.previewEl} />;
+  }
+}
 
 export default PreviewLayer;
