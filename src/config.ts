@@ -1,0 +1,1 @@
+export const SOCKET_URL: string = 'wss://eet9dftczl.execute-api.us-east-1.amazonaws.com/dev';

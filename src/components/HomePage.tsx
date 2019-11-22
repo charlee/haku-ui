@@ -1,7 +1,21 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/styles';
-import { Theme, createStyles, Paper, Typography, Button, TextField, Grid, Box } from '@material-ui/core';
+import {
+  Theme,
+  createStyles,
+  Paper,
+  Typography,
+  Button,
+  TextField,
+  Grid,
+  Box,
+  Snackbar,
+  SnackbarContent,
+  IconButton,
+} from '@material-ui/core';
+import { Close as CloseIcon } from '@material-ui/icons';
 import { navigate } from 'hookrouter';
+import api from '../lib/api';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -16,6 +30,18 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: '0 auto',
       padding: theme.spacing(4),
     },
+
+    icon: {
+      fontSize: 20,
+    },
+
+    error: {
+      backgroundColor: theme.palette.error.dark,
+    },
+    message: {
+      display: 'flex',
+      alignItems: 'center',
+    },
   }),
 );
 
@@ -23,14 +49,28 @@ const HomePage: React.FC = () => {
   const classes = useStyles();
 
   const [whiteboardId, setWhiteboardId] = React.useState('');
+  const [error, setError] = React.useState('');
 
-  const handleCreateNew = () => {
-    const id = Math.floor(Math.random() * 1000000000);
-    navigate(`/b/${id}`);
+  const handleSnackClose = () => {
+    setError('');
   };
 
-  const handleJoin = () => {
-    navigate(`/b/${whiteboardId}`);
+  const handleCreateNew = async () => {
+    try {
+      await api.open();
+      // navigate(`/b/${id}`);
+    } catch (e) {
+      setError('Error occured, please try again later.');
+    }
+  };
+
+  const handleJoin = async () => {
+    try {
+      await api.open(whiteboardId);
+      navigate(`/b/${whiteboardId}`);
+    } catch (e) {
+      setError('Board not found');
+    }
   };
 
   return (
@@ -72,6 +112,27 @@ const HomePage: React.FC = () => {
             </Grid>
           </Grid>
         </Box>
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          open={!!error}
+          autoHideDuration={3000}
+          onClose={handleSnackClose}
+        >
+          <SnackbarContent
+            className={classes.error}
+            aria-describedby="client-snackbar"
+            message={
+              <span id="client-snackbar" className={classes.message}>
+                {error}
+              </span>
+            }
+            action={[
+              <IconButton key="close" aria-label="close" color="inherit" onClick={handleSnackClose}>
+                <CloseIcon className={classes.icon} />
+              </IconButton>,
+            ]}
+          />
+        </Snackbar>
       </Paper>
     </div>
   );
