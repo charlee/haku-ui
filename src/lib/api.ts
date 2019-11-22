@@ -51,6 +51,10 @@ export class API {
 
   constructor(private socketUrl: string) {}
 
+  isOpen() {
+    return !!this.ws;
+  }
+
   /**
    * Open a whiteboard. If whiteboardId is ignored, then create a new whiteboard.
    * @param whiteboardId whiteboard id.

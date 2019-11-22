@@ -1,7 +1,16 @@
 import React from 'react';
 import Konva from 'konva';
 import { makeStyles } from '@material-ui/styles';
-import { Theme, createStyles, Paper, Typography, Button, TextField } from '@material-ui/core';
+import {
+  Theme,
+  createStyles,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  CircularProgress,
+  Box,
+  Typography,
+} from '@material-ui/core';
 import { Stage, Layer } from 'react-konva';
 import PreviewLayer from './PreviewLayer';
 import simplifyLine from '../utils/simplifyLine';
@@ -24,8 +33,6 @@ import {
   lightGreen,
 } from '@material-ui/core/colors';
 import api from '../lib/api';
-
-const uuidv1 = require('uuid/v1');
 
 type Props = {
   boardId: string;
@@ -67,23 +74,43 @@ const WhiteboardPage: React.FC<Props> = props => {
 
   const [selectedColor, setSelectedColor] = React.useState(colors[0]);
 
+  const [connecting, setConnecting] = React.useState(false);
+  const [error, setError] = React.useState(false);
+
+  React.useEffect(() => {
+    const { boardId } = props;
+
+    // If load the board page directly, try to reconnect
+    if (boardId && !api.isOpen()) {
+      setConnecting(true);
+      api
+        .open(boardId)
+        .catch(e => {
+          setError(true);
+        })
+        .finally(() => {
+          setConnecting(false);
+        });
+    }
+  });
+
   const handleLineCreated = (line: Konva.Line) => {
     console.log('handleLineCreated');
     if (layerEl.current) {
       const layer = layerEl.current;
+
       const simplifiedLine = simplifyLine(line, 1);
       layer.add(simplifiedLine);
-      console.log(simplifiedLine.points().length);
       layer.batchDraw();
 
       // send to server
-      // api.addLine({
-      //   type: 'line',
-      //   data: {
-      //     color: line.stroke(),
-      //     points: line.points(),
-      //   },
-      // });
+      api.addLine({
+        type: 'line',
+        data: {
+          color: simplifiedLine.stroke(),
+          points: simplifiedLine.points(),
+        },
+      });
     }
   };
 
@@ -99,6 +126,25 @@ const WhiteboardPage: React.FC<Props> = props => {
         selectedColor={selectedColor}
         onColorChange={setSelectedColor}
       />
+      <Dialog open={connecting}>
+        <DialogContent>
+          <Box alignItems="center" display="flex" padding={2}>
+            <CircularProgress />
+            <Box marginLeft={2}>
+              <Typography variant="body1">Connecting...</Typography>
+            </Box>
+          </Box>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={error}>
+        <DialogContent>
+          <Box alignItems="center" display="flex" padding={2}>
+            <Typography variant="body1">
+              Failed to connect to Haku, please ensure your whiteboard ID is correct.
+            </Typography>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

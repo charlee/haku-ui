@@ -22,8 +22,7 @@
     "react-scripts": "3.2.0",
     "simplify-js": "^1.2.3",
     "typescript": "3.7.2",
-    "use-image": "^1.0.5",
-    "uuid": "^3.3.3"
+    "use-image": "^1.0.5"
   },
   "scripts": {
     "start": "react-scripts start",
