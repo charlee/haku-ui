@@ -23,6 +23,7 @@ import {
   grey,
   lightGreen,
 } from '@material-ui/core/colors';
+import api from '../lib/api';
 
 const uuidv1 = require('uuid/v1');
 
@@ -73,6 +74,15 @@ const WhiteboardPage: React.FC<Props> = props => {
       console.log(line);
       layer.add(simplifyLine(line, 1));
       layer.batchDraw();
+
+      // send to server
+      api.addLine({
+        type: 'line',
+        data: {
+          color: line.stroke(),
+          points: line.points(),
+        },
+      });
     }
   };
 
