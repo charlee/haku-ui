@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { makeStyles } from '@material-ui/styles';
-import { Theme, createStyles, Paper } from '@material-ui/core';
+import { Theme, createStyles, Paper, Box, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -19,9 +19,9 @@ const ConnectionList: React.FC<Props> = props => {
   const classes = useStyles();
   return (
     <Paper className={classNames(classes.root, className)}>
-      {connectionIds.map(connectionId => (
-        <div>{connectionId}</div>
-      ))}
+      <Box padding={1}>
+        <Typography variant="body1">Current # users: {connectionIds.length}</Typography>
+      </Box>
     </Paper>
   );
 };
