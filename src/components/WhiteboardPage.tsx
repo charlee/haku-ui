@@ -7,6 +7,7 @@ import PreviewLayer from './PreviewLayer';
 import simplifyLine from '../utils/simplifyLine';
 import ColorPicker from './ColorPicker';
 import ToolPicker from './ToolPicker';
+import ConnectionList from './ConnectionList';
 import {
   red,
   pink,
@@ -24,7 +25,7 @@ import {
   grey,
   lightGreen,
 } from '@material-ui/core/colors';
-import api, { WsCallback, Message, Line } from '../lib/api';
+import api, { Line, BoardData } from '../lib/api';
 
 type Props = {
   boardId: string;
@@ -69,6 +70,8 @@ const WhiteboardPage: React.FC<Props> = props => {
 
   const [connecting, setConnecting] = React.useState(false);
   const [error, setError] = React.useState(false);
+  const [connectionIds, setConnectionIds] = React.useState<string[]>([]);
+  const [myConnectionId, setMyConnectionId] = React.useState<string>('');
 
   const handleLineAdded = (lineData: Line) => {
     const { color, width, points } = lineData.data;
@@ -87,24 +90,39 @@ const WhiteboardPage: React.FC<Props> = props => {
     }
   };
 
+  const handleBoardData = (boardData: BoardData) => {
+    // TODO: handle init image and lines
+
+    setMyConnectionId(boardData.myConnectionId);
+    setConnectionIds(boardData.connections);
+  };
+
+  const initAPI = () => {
+    api.registerOnLineAdded(handleLineAdded);
+    api.registerOnBoardData(handleBoardData);
+    api.init();
+  };
+
   React.useEffect(() => {
     const { boardId } = props;
 
     // If load the board page directly, try to reconnect
+    console.log(boardId, api.isOpen());
     if (boardId && !api.isOpen()) {
       setConnecting(true);
       api
         .open(boardId)
+        .then(initAPI)
         .catch(e => {
           setError(true);
         })
         .finally(() => {
           setConnecting(false);
         });
+    } else {
+      initAPI();
     }
-
-    api.registerOnLineAdded(handleLineAdded);
-  });
+  }, []);
 
   const handleLineCreated = (line: Konva.Line) => {
     const { boardId } = props;
@@ -142,7 +160,11 @@ const WhiteboardPage: React.FC<Props> = props => {
         <Box marginBottom={1}>
           <ToolPicker selectedTool={selectedTool} onToolChange={setSelectedTool} />
         </Box>
+        <Box marginBottom={1}>
+          <ConnectionList connectionIds={connectionIds} />
+        </Box>
       </Box>
+
       <Dialog open={connecting}>
         <DialogContent>
           <Box alignItems="center" display="flex" padding={2}>

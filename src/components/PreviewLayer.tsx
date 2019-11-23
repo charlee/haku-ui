@@ -1,6 +1,6 @@
 import React from 'react';
 import Konva from 'konva';
-import { Stage, Layer } from 'react-konva';
+import { Layer } from 'react-konva';
 
 type Props = {
   onLineCreated: (line: Konva.Line) => void;

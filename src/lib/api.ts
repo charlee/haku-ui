@@ -1,4 +1,5 @@
 import { SOCKET_URL } from '../config';
+import { PhoneCallbackOutlined } from '@material-ui/icons';
 
 export type Line = {
   type: 'line';
@@ -8,6 +9,19 @@ export type Line = {
     width: number;
     points: number[];
   };
+};
+
+/**
+ * Definition for the board data.
+ * Used for initializing the session (with 'init' request).
+ * image, lines can be empty for the following notifications.
+ */
+export type BoardData = {
+  boardId: string;
+  myConnectionId: string;
+  image?: object;
+  lines: Line[];
+  connections: string[];
 };
 
 export type Message = {
@@ -45,9 +59,9 @@ export class WS {
         resolve(event);
       };
 
-      this.socket.onmessage= event => {
+      this.socket.onmessage = event => {
         this.handleMessage(JSON.parse(event.data) as Message);
-      }
+      };
     });
   }
 
@@ -58,7 +72,6 @@ export class WS {
   }
 
   on(action: string, callback: WsCallback) {
-
     if (!this.callbacks[action]) {
       this.callbacks[action] = [];
     }
@@ -78,11 +91,12 @@ export class WS {
 
 export class API {
   private ws?: WS = undefined;
+  private _open: boolean = false;
 
   constructor(private socketUrl: string) {}
 
   isOpen() {
-    return !!this.ws;
+    return this._open;
   }
 
   /**
@@ -91,7 +105,9 @@ export class API {
    */
   open(boardId?: string) {
     this.ws = new WS(this.socketUrl, { bid: boardId || 'new' });
-    return this.ws.open();
+    return this.ws.open().then(() => {
+      this._open = true;
+    });
   }
 
   addLine(line: Line) {
@@ -105,13 +121,38 @@ export class API {
     });
   }
 
+  /**
+   * 'init' request.
+   * The server will send back `initData` messages after the initial `init` request.
+   */
+  init() {
+    if (!this.ws) {
+      throw new Error('Socket not open');
+    }
+
+    this.ws.send({
+      action: 'init',
+      payload: {},
+    });
+  }
+
   registerOnLineAdded(callback: (line: Line) => void) {
     if (!this.ws) {
       throw new Error('Socket not open');
     }
 
     this.ws.on('lineAdded', (message: Message) => {
-      callback(message.payload as Line)
+      callback(message.payload as Line);
+    });
+  }
+
+  registerOnBoardData(callback: (data: BoardData) => void) {
+    if (!this.ws) {
+      throw new Error('Socket not open');
+    }
+
+    this.ws.on('boardData', (message: Message) => {
+      callback(message.payload as BoardData);
     });
   }
 }
