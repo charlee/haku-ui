@@ -2,8 +2,10 @@ import { SOCKET_URL } from '../config';
 
 export type Line = {
   type: 'line';
+  boardId: string;
   data: {
     color: string;
+    width: number;
     points: number[];
   };
 };
@@ -13,9 +15,15 @@ export type Message = {
   payload: object;
 };
 
+export type WsCallback = (message: Message) => void;
+
 export class WS {
   private socket?: WebSocket = undefined;
   private url: string;
+
+  private callbacks: {
+    [key: string]: WsCallback[];
+  } = {};
 
   constructor(url: string, params?: { [key: string]: number | string }) {
     const qs =
@@ -36,12 +44,34 @@ export class WS {
       this.socket.onopen = event => {
         resolve(event);
       };
+
+      this.socket.onmessage= event => {
+        this.handleMessage(JSON.parse(event.data) as Message);
+      }
     });
   }
 
   send(data: object) {
     if (this.socket) {
       return this.socket.send(JSON.stringify(data));
+    }
+  }
+
+  on(action: string, callback: WsCallback) {
+
+    if (!this.callbacks[action]) {
+      this.callbacks[action] = [];
+    }
+
+    this.callbacks[action].push(callback);
+  }
+
+  handleMessage(message: Message) {
+    const callbacks: WsCallback[] | undefined = this.callbacks[message.action];
+    if (callbacks) {
+      for (const callback of callbacks) {
+        callback(message);
+      }
     }
   }
 }
@@ -60,7 +90,7 @@ export class API {
    * @param whiteboardId whiteboard id.
    */
   open(boardId?: string) {
-    this.ws = new WS(SOCKET_URL, { bid: boardId || 'new' });
+    this.ws = new WS(this.socketUrl, { bid: boardId || 'new' });
     return this.ws.open();
   }
 
@@ -72,6 +102,16 @@ export class API {
     this.ws.send({
       action: 'addLine',
       payload: line,
+    });
+  }
+
+  registerOnLineAdded(callback: (line: Line) => void) {
+    if (!this.ws) {
+      throw new Error('Socket not open');
+    }
+
+    this.ws.on('lineAdded', (message: Message) => {
+      callback(message.payload as Line)
     });
   }
 }

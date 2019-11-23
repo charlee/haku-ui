@@ -24,7 +24,7 @@ import {
   grey,
   lightGreen,
 } from '@material-ui/core/colors';
-import api from '../lib/api';
+import api, { WsCallback, Message, Line } from '../lib/api';
 
 type Props = {
   boardId: string;
@@ -70,6 +70,23 @@ const WhiteboardPage: React.FC<Props> = props => {
   const [connecting, setConnecting] = React.useState(false);
   const [error, setError] = React.useState(false);
 
+  const handleLineAdded = (lineData: Line) => {
+    const { color, width, points } = lineData.data;
+    if (layerEl.current) {
+      const layer = layerEl.current;
+
+      const line = new Konva.Line({
+        stroke: color,
+        strokeWidth: width,
+        globalCompositeOperation: 'source-over',
+        points,
+        draggable: false,
+      });
+      layer.add(line);
+      layer.batchDraw();
+    }
+  };
+
   React.useEffect(() => {
     const { boardId } = props;
 
@@ -85,10 +102,12 @@ const WhiteboardPage: React.FC<Props> = props => {
           setConnecting(false);
         });
     }
+
+    api.registerOnLineAdded(handleLineAdded);
   });
 
   const handleLineCreated = (line: Konva.Line) => {
-    console.log('handleLineCreated');
+    const { boardId } = props;
     if (layerEl.current) {
       const layer = layerEl.current;
 
@@ -99,8 +118,10 @@ const WhiteboardPage: React.FC<Props> = props => {
       // send to server
       api.addLine({
         type: 'line',
+        boardId,
         data: {
           color: simplifiedLine.stroke(),
+          width: simplifiedLine.strokeWidth(),
           points: simplifiedLine.points(),
         },
       });
