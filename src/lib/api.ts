@@ -24,6 +24,10 @@ export type BoardData = {
   connections: string[];
 };
 
+export type BoardId = {
+  boardId: string;
+};
+
 export type Message = {
   action: string;
   payload: object;
@@ -136,6 +140,17 @@ export class API {
     });
   }
 
+  getBoardId() {
+    if (!this.ws) {
+      throw new Error('Socket not open');
+    }
+
+    this.ws.send({
+      action: 'getBoardId',
+      payload: {},
+    })
+  }
+
   registerOnLineAdded(callback: (line: Line) => void) {
     if (!this.ws) {
       throw new Error('Socket not open');
@@ -153,6 +168,16 @@ export class API {
 
     this.ws.on('boardData', (message: Message) => {
       callback(message.payload as BoardData);
+    });
+  }
+
+  registerOnBoardId(callback: (data: BoardId) => void) {
+    if (!this.ws) {
+      throw new Error('Socket not open');
+    }
+
+    this.ws.on('boardId', (message: Message) => {
+      callback(message.payload as BoardId);
     });
   }
 }

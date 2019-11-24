@@ -15,7 +15,7 @@ import {
 } from '@material-ui/core';
 import { Close as CloseIcon, SettingsSystemDaydream } from '@material-ui/icons';
 import { navigate } from 'hookrouter';
-import api from '../lib/api';
+import api, { BoardId } from '../lib/api';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -55,10 +55,16 @@ const HomePage: React.FC = () => {
     setError('');
   };
 
+  const handleReceiveBoardId = (data: BoardId) => {
+    console.log(data);
+    navigate(`/b/${data.boardId}`);
+  }
+
   const handleCreateNew = async () => {
     try {
       await api.open();
-      // navigate(`/b/${id}`);
+      api.registerOnBoardId(handleReceiveBoardId);
+      api.getBoardId();
     } catch (e) {
       setError('Error occured, please try again later.');
     }
