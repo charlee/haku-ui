@@ -12,6 +12,9 @@ import {
   Snackbar,
   SnackbarContent,
   IconButton,
+  Dialog,
+  DialogContent,
+  CircularProgress,
 } from '@material-ui/core';
 import { Close as CloseIcon } from '@material-ui/icons';
 import { navigate } from 'hookrouter';
@@ -60,6 +63,7 @@ const HomePage: React.FC = () => {
 
   const [whiteboardId, setWhiteboardId] = React.useState('');
   const [error, setError] = React.useState('');
+  const [connecting, setConnecting] = React.useState(false);
 
   const handleSnackClose = () => {
     setError('');
@@ -68,24 +72,28 @@ const HomePage: React.FC = () => {
   const handleReceiveBoardId = (data: BoardId) => {
     console.log(data);
     navigate(`/b/${data.boardId}`);
-  }
+  };
 
   const handleCreateNew = async () => {
     try {
+      setConnecting(true);
       await api.open();
       api.registerOnBoardId(handleReceiveBoardId);
       api.getBoardId();
     } catch (e) {
       setError('Error occured, please try again later.');
+      setConnecting(false);
     }
   };
 
   const handleJoin = async () => {
     try {
+      setConnecting(true);
       await api.open(whiteboardId);
       navigate(`/b/${whiteboardId}`);
     } catch (e) {
       setError('Board not found');
+      setConnecting(false);
     }
   };
 
@@ -101,7 +109,7 @@ const HomePage: React.FC = () => {
             <Grid item xs={12} md={6}>
               <Typography variant="body1">Create a new whiteboard and share with your collaborators.</Typography>
               <Box minHeight={160} display="flex" alignItems="center" justifyContent="center">
-                <Button variant="contained" color="primary" onClick={handleCreateNew}>
+                <Button variant="contained" color="primary" onClick={handleCreateNew} disabled={connecting}>
                   Create whiteboard
                 </Button>
               </Box>
@@ -119,7 +127,7 @@ const HomePage: React.FC = () => {
                     />
                   </Grid>
                   <Grid item xs={4}>
-                    <Button variant="contained" color="primary" onClick={handleJoin}>
+                    <Button variant="contained" color="primary" onClick={handleJoin} disabled={connecting}>
                       Join
                     </Button>
                   </Grid>
@@ -149,6 +157,16 @@ const HomePage: React.FC = () => {
             ]}
           />
         </Snackbar>
+        <Dialog open={connecting}>
+          <DialogContent>
+            <Box alignItems="center" display="flex" padding={2}>
+              <CircularProgress />
+              <Box marginLeft={2}>
+                <Typography variant="body1">Connecting...</Typography>
+              </Box>
+            </Box>
+          </DialogContent>
+        </Dialog>
       </Paper>
     </div>
   );
