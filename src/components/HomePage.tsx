@@ -20,13 +20,23 @@ import api, { BoardId } from '../lib/api';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      backgroundColor: theme.palette.background.default,
+      backgroundColor: theme.palette.background.paper,
       height: '100vh',
-      paddingTop: 180,
+      [theme.breakpoints.down('md')]: {
+        paddingTop: 80,
+      },
+      [theme.breakpoints.up('md')]: {
+        paddingTop: 180,
+      },
     },
 
     form: {
-      width: 600,
+      [theme.breakpoints.down('md')]: {
+        width: 480,
+      },
+      [theme.breakpoints.up('md')]: {
+        width: 600,
+      },
       margin: '0 auto',
       padding: theme.spacing(4),
     },
@@ -88,7 +98,7 @@ const HomePage: React.FC = () => {
 
         <Box mt={5}>
           <Grid container spacing={3}>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <Typography variant="body1">Create a new whiteboard and share with your collaborators.</Typography>
               <Box minHeight={160} display="flex" alignItems="center" justifyContent="center">
                 <Button variant="contained" color="primary" onClick={handleCreateNew}>
@@ -97,7 +107,7 @@ const HomePage: React.FC = () => {
               </Box>
             </Grid>
 
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <Typography variant="body1">Join an existing whiteboard if you know the id.</Typography>
               <Box minHeight={160} display="flex" alignItems="center" justifyContent="center">
                 <Grid container spacing={1}>
