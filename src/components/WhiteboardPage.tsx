@@ -68,6 +68,11 @@ const WhiteboardPage: React.FC<Props> = props => {
   const [selectedColor, setSelectedColor] = React.useState(colors[0]);
   const [selectedTool, setSelectedTool] = React.useState('pen');
 
+  const [dimension, setDimension] = React.useState<{ width: number; height: number }>({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
   const [connecting, setConnecting] = React.useState(false);
   const [error, setError] = React.useState(false);
   const [connectionIds, setConnectionIds] = React.useState<string[]>([]);
@@ -103,6 +108,11 @@ const WhiteboardPage: React.FC<Props> = props => {
     api.init();
   };
 
+  const handleResize = () => {
+    console.log('resize');
+    setDimension({ width: window.innerWidth, height: window.innerHeight });
+  };
+
   React.useEffect(() => {
     const { boardId } = props;
 
@@ -122,7 +132,18 @@ const WhiteboardPage: React.FC<Props> = props => {
     } else {
       initAPI();
     }
+
+    // resize
+    window.addEventListener('resize', handleResize);
   }, []);
+
+  // componentDidUnmount
+  React.useEffect(
+    () => () => {
+      window.removeEventListener('resize', handleResize);
+    },
+    [],
+  );
 
   const handleLineCreated = (line: Konva.Line) => {
     const { boardId } = props;
@@ -148,7 +169,7 @@ const WhiteboardPage: React.FC<Props> = props => {
 
   return (
     <div className="WhiteboardPage">
-      <Stage width={window.innerWidth} height={window.innerHeight - 150}>
+      <Stage width={dimension.width} height={dimension.height}>
         <Layer ref={layerEl}></Layer>
         <PreviewLayer color={selectedColor} tool={selectedTool} onLineCreated={handleLineCreated} />
       </Stage>
