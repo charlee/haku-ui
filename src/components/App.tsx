@@ -8,6 +8,8 @@ import Logo from './Logo';
 import { makeStyles, createStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core';
 
+import Footer from './Footer';
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -35,6 +37,7 @@ const App: React.FC = () => {
     <div className={classes.root}>
       <Logo className={classes.logo}/>
       {routeResult}
+      <Footer/>
     </div>
   );
 };

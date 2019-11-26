@@ -1,5 +1,4 @@
 import { SOCKET_URL } from '../config';
-import { PhoneCallbackOutlined } from '@material-ui/icons';
 
 export type Line = {
   type: 'line';

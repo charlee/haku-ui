@@ -13,7 +13,7 @@ import {
   SnackbarContent,
   IconButton,
 } from '@material-ui/core';
-import { Close as CloseIcon, SettingsSystemDaydream } from '@material-ui/icons';
+import { Close as CloseIcon } from '@material-ui/icons';
 import { navigate } from 'hookrouter';
 import api, { BoardId } from '../lib/api';
 
