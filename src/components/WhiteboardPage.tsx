@@ -100,6 +100,38 @@ const WhiteboardPage: React.FC<Props> = props => {
 
     setMyConnectionId(boardData.myConnectionId);
     setConnectionIds(boardData.connections);
+
+    // If image exists, draw the image
+    if (boardData.image) {
+      const image = new Image();
+      image.addEventListener('load', () => {
+        const img = new Konva.Image({ image, x: 0, y: 0 });
+        if (layerEl.current) {
+          const layer = layerEl.current;
+          layer.add(img);
+          img.moveToBottom();
+          layer.batchDraw();
+        }
+      });
+      image.src = 'data:image/png;base64,' + boardData.image;
+    }
+
+    // Draw lines
+    if (layerEl.current) {
+      const layer = layerEl.current;
+      for (const lineData of boardData.lines) {
+        const { color, width, points } = lineData.data;
+        const line = new Konva.Line({
+          stroke: color,
+          strokeWidth: width,
+          globalCompositeOperation: 'source-over',
+          points,
+          draggable: false,
+        });
+        layer.add(line);
+      }
+      layer.batchDraw();
+    }
   };
 
   const initAPI = () => {

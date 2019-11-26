@@ -18,7 +18,7 @@ export type Line = {
 export type BoardData = {
   boardId: string;
   myConnectionId: string;
-  image?: object;
+  image?: string;
   lines: Line[];
   connections: string[];
 };
