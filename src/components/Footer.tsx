@@ -8,7 +8,6 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       position: 'fixed',
       bottom: 0,
-      width: '100%',
       height: 36,
       padding: theme.spacing(1),
       left: 0,
