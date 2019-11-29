@@ -122,7 +122,7 @@ const HomePage: React.FC = () => {
                   <Grid item xs={8}>
                     <TextField
                       value={whiteboardId}
-                      placeholder="e.g. 144-425-661"
+                      placeholder="e.g. 1444256611"
                       onChange={e => setWhiteboardId(e.target.value)}
                     />
                   </Grid>
